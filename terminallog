@@ -1,0 +1,328 @@
+anhductk74@anhductk74-VMware-Virtual-Platform:~/fabric_samples/Supply-Chain$ ../bin/cryptogen generate --config=./artifacts/crypto-config.yaml --output=./artifacts/network/crypto-config
+
+export FABRIC_CFG_PATH=${PWD}/artifacts
+export SYS_CHANNEL=syschannel
+export IMAGE_TAG=latest
+
+../bin/configtxgen -profile TraceOrdererGenesis -outputBlock ./artifacts/network/genesis.block -channelID $SYS_CHANNEL
+
+export CHANNEL_NAME=supplychainchannel
+
+../bin/configtxgen -profile TraceOrgsChannel -outputCreateChannelTx ./artifacts/network/channel.tx -channelID $CHANNEL_NAME
+
+../bin/configtxgen -profile TraceOrgsChannel -outputAnchorPeersUpdate ./artifacts/network/ManufacturerMSPanchors.tx -channelID $CHANNEL_NAME -asOrg ManufacturerMSP
+
+../bin/configtxgen -profile TraceOrgsChannel -outputAnchorPeersUpdate ./artifacts/network/MiddleMenMSPanchors.tx -channelID $CHANNEL_NAME -asOrg MiddleMenMSP
+
+../bin/configtxgen -profile TraceOrgsChannel -outputAnchorPeersUpdate ./artifacts/network/ConsumerMSPanchors.tx -channelID $CHANNEL_NAME -asOrg ConsumerMSP
+
+export MANUFACTURER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/manufacturer.example.com/ca && ls *_sk)
+
+export MIDDLEMEN_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/middlemen.example.com/ca && ls *_sk)
+
+export CONSUMER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/consumer.example.com/ca && ls *_sk)
+
+docker-compose -p supplychain -f artifacts/docker-compose.yaml up -d
+
+docker exec -it cli bash
+manufacturer.example.com
+middlemen.example.com
+consumer.example.com
+2025-05-12 22:54:02.364 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-12 22:54:02.379 +07 0002 INFO [common.tools.configtxgen.localconfig] completeInitialization -> orderer type: solo
+2025-05-12 22:54:02.379 +07 0003 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-12 22:54:02.382 +07 0004 INFO [common.tools.configtxgen] doOutputBlock -> Generating genesis block
+2025-05-12 22:54:02.382 +07 0005 INFO [common.tools.configtxgen] doOutputBlock -> Creating system channel genesis block
+2025-05-12 22:54:02.382 +07 0006 INFO [common.tools.configtxgen] doOutputBlock -> Writing genesis block
+2025-05-12 22:54:02.435 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-12 22:54:02.450 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-12 22:54:02.450 +07 0003 INFO [common.tools.configtxgen] doOutputChannelCreateTx -> Generating new channel configtx
+2025-05-12 22:54:02.454 +07 0004 INFO [common.tools.configtxgen] doOutputChannelCreateTx -> Writing new channel tx
+2025-05-12 22:54:02.508 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-12 22:54:02.525 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-12 22:54:02.525 +07 0003 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Generating anchor peer update
+2025-05-12 22:54:02.528 +07 0004 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Writing anchor peer update
+2025-05-12 22:54:02.594 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-12 22:54:02.618 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-12 22:54:02.618 +07 0003 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Generating anchor peer update
+2025-05-12 22:54:02.620 +07 0004 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Writing anchor peer update
+2025-05-12 22:54:02.672 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-12 22:54:02.688 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-12 22:54:02.688 +07 0003 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Generating anchor peer update
+2025-05-12 22:54:02.691 +07 0004 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Writing anchor peer update
+Creating network "net_supplychain_hlfn" with the default driver
+Creating volume "supplychain_orderer.example.com" with default driver
+Creating volume "supplychain_peer0.manufacturer.example.com" with default driver
+Creating volume "supplychain_peer0.middlemen.example.com" with default driver
+Creating volume "supplychain_peer1.middlemen.example.com" with default driver
+Creating volume "supplychain_peer2.middlemen.example.com" with default driver
+Creating volume "supplychain_peer0.consumer.example.com" with default driver
+Creating peer2.middlemen.example.com    ... done
+Creating peer0.consumer.example.com     ... done
+Creating orderer.example.com            ... done
+Creating ca.manufacturer.example.com    ... done
+Creating peer0.middlemen.example.com    ... done
+Creating ca.consumer.example.com        ... done
+Creating peer0.manufacturer.example.com ... done
+Creating peer1.middlemen.example.com    ... done
+Creating ca.middlemen.example.com       ... done
+Creating cli                            ... done
+root@157b92707ac0:/opt/gopath/src/github.com/hyperledger/fabric/peer# export CHANNEL_NAME=supplychainchannel
+
+peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+peer channel join -b supplychainchannel.block
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer0.middlemen.example.com:8051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer1.middlemen.example.com:9051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer1.middlemen.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer2.middlemen.example.com:10051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer2.middlemen.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/users/Admin@consumer.example.com/msp CORE_PEER_ADDRESS=peer0.consumer.example.com:11051 CORE_PEER_LOCALMSPID="ConsumerMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/users/Admin@manufacturer.example.com/msp CORE_PEER_ADDRESS=peer0.manufacturer.example.com:7051 CORE_PEER_LOCALMSPID="ManufacturerMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/ManufacturerMSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer0.middlemen.example.com:8051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/MiddleMenMSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/users/Admin@consumer.example.com/msp CORE_PEER_ADDRESS=peer0.consumer.example.com:11051 CORE_PEER_LOCALMSPID="ConsumerMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/ConsumerMSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/users/Admin@manufacturer.example.com/msp CORE_PEER_ADDRESS=peer0.manufacturer.example.com:7051 
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/users/Admin@manufacturer.example.com/msp 
+CORE_PEER_ADDRESS=peer0.manufacturer.example.com:7051 
+CORE_PEER_LOCALMSPID="ManufacturerMSP" 
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt
+# CORE_PEER_LOCALMSPID="ManufacturerMSP" 
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt 
+
+cd /opt/gopath/src/github.com/chaincode/supplychain
+export GO111MODULE=on
+export GOFLAGS='-mod=vendor'
+export ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+# go mod tidy
+# go mod vendor
+peer chaincode install -n supplychaincc -v 1.0 -p github.com/chaincode/supplychain
+# peer chaincode install -n supplychaincc -v 1.0 -p github.com/chaincode/
+peer lifecycle chaincode package supplychain.tar.gz \
+  --path github.com/chaincode/supplychain \
+  --lang golang \
+  --label supplychain_1
+peer lifecycle chaincode install supplychain.tar.gz
+peer lifecycle chaincode queryinstalled
+2025-05-12 15:54:31.397 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:31.430 UTC 0002 INFO [cli.common] readBlock -> Received block: 0
+2025-05-12 15:54:31.520 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:31.546 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-12 15:54:31.617 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:31.642 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-12 15:54:31.712 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:31.736 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-12 15:54:31.810 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:31.835 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-12 15:54:31.903 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:31.927 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-12 15:54:32.006 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:32.022 UTC 0002 INFO [channelCmd] update -> Successfully submitted channel update
+2025-05-12 15:54:32.092 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:32.112 UTC 0002 INFO [channelCmd] update -> Successfully submitted channel update
+2025-05-12 15:54:32.179 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-12 15:54:32.196 UTC 0002 INFO [channelCmd] update -> Successfully submitted channel update
+2025-05-12 15:54:32.270 UTC 0001 INFO [chaincodeCmd] checkChaincodeCmdParams -> Using default escc
+2025-05-12 15:54:32.270 UTC 0002 INFO [chaincodeCmd] checkChaincodeCmdParams -> Using default vscc
+2025-05-12 15:54:36.975 UTC 0003 INFO [chaincodeCmd] submitInstallProposal -> Installed remotely: response:<status:200 payload:"OK" > 
+2025-05-12 15:55:12.737 UTC 0001 INFO [cli.lifecycle.chaincode] submitInstallProposal -> Installed remotely: response:<status:200 payload:"\nNsupplychain_1:ec2c28841fe1c9f6c80cb69610ce88ba20c87728beb265aa03e871dec0faf894\022\rsupplychain_1" > 
+2025-05-12 15:55:12.738 UTC 0002 INFO [cli.lifecycle.chaincode] submitInstallProposal -> Chaincode code package identifier: supplychain_1:ec2c28841fe1c9f6c80cb69610ce88ba20c87728beb265aa03e871dec0faf894
+Installed chaincodes on peer:
+Package ID: supplychain_1:ec2c28841fe1c9f6c80cb69610ce88ba20c87728beb265aa03e871dec0faf894, Label: supplychain_1
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# export CCPID=supplychain_1:ec2c28841fe1c9f6c80cb69610ce88ba20c87728beb265aa03e871dec0faf894
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer lifecycle chaincode approveformyorg \
+  -o orderer.example.com:7050 \
+  --channelID supplychainchannel \
+  --name supplychaincc \
+  --version 1.0 \
+  --package-id $CCPID \
+  --sequence 1 \
+  --init-required \
+  --signature-policy "OR('ManufacturerMSP.peer')" \
+  --tls \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt
+
+export CORE_PEER_LOCALMSPID="MiddleMenMSP"
+export CORE_PEER_ADDRESS=peer0.middlemen.example.com:8051
+export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp
+export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt
+
+# peer lifecycle chaincode install supplychain.tar.gz
+
+peer lifecycle chaincode approveformyorg \
+  -o orderer.example.com:7050 \
+  --channelID supplychainchannel \
+  --name supplychaincc \
+  --version 1.0 \
+  --package-id $CCPID \
+  --sequence 1 \
+  --init-required \
+  --signature-policy "OR('ManufacturerMSP.peer')" \
+  --tls \
+  --cafile $ORDERER_CA \
+  --peerAddresses $CORE_PEER_ADDRESS \
+  --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+
+export CORE_PEER_LOCALMSPID="ConsumerMSP"
+export CORE_PEER_ADDRESS=peer0.consumer.example.com:11051
+export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/users/Admin@consumer.example.com/msp
+export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt
+
+# peer lifecycle chaincode install supplychain.tar.gz
+peer lifecycle chaincode approveformyorg \
+  -o orderer.example.com:7050 \
+  --channelID supplychainchannel \
+  --name supplychaincc \
+  --version 1.0 \
+  --package-id $CCPID \
+  --sequence 1 \
+  --init-required \
+  --signature-policy "OR('ManufacturerMSP.peer')" \
+  --tls \
+  --cafile $ORDERER_CA \
+  --peerAddresses $CORE_PEER_ADDRESS \
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt
+2025-05-12 15:56:00.899 UTC 0001 INFO [chaincodeCmd] ClientWait -> txid [47381a3eae5978c041d06896cc21c3824d655b8083c274b52d9c98ac5d139fa7] committed with status (VALID) at peer0.manufacturer.example.com:7051
+2025-05-12 15:56:03.014 UTC 0001 INFO [chaincodeCmd] ClientWait -> txid [bd5f8b2f0cb05f71b310e65c1720e3abc2185e0678b4c1cd4d283e06e324303b] committed with status (VALID) at peer0.middlemen.example.com:8051
+2025-05-12 15:56:05.118 UTC 0001 INFO [chaincodeCmd] ClientWait -> txid [2d7f535004a82833e90054a8e09342938409241bf28c7b97dda3eabef5ef5d8d] committed with status (VALID) at peer0.consumer.example.com:11051
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# 
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/users/Admin@manufacturer.example.com/msp 
+CORE_PEER_ADDRESS=peer0.manufacturer.example.com:7051 
+CORE_PEER_LOCALMSPID="ManufacturerMSP" 
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt
+
+
+peer lifecycle chaincode commit \
+  -o orderer.example.com:7050 \
+  --channelID supplychainchannel \
+  --name supplychaincc \
+  --version 1.0 \
+  --sequence 1 \
+  --init-required \
+  --signature-policy "OR('ManufacturerMSP.peer')" \
+  --tls \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  --peerAddresses peer0.middlemen.example.com:8051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt \
+  --peerAddresses peer0.consumer.example.com:11051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt
+2025-05-12 15:56:53.165 UTC 0001 INFO [chaincodeCmd] ClientWait -> txid [a877e5e23ef5b9324b1014977cde297ac9625585a6a82db8831734b7f580c52d] committed with status (VALID) at peer0.consumer.example.com:11051
+2025-05-12 15:56:53.171 UTC 0002 INFO [chaincodeCmd] ClientWait -> txid [a877e5e23ef5b9324b1014977cde297ac9625585a6a82db8831734b7f580c52d] committed with status (VALID) at peer0.middlemen.example.com:8051
+2025-05-12 15:56:53.461 UTC 0003 INFO [chaincodeCmd] ClientWait -> txid [a877e5e23ef5b9324b1014977cde297ac9625585a6a82db8831734b7f580c52d] committed with status (VALID) at peer0.manufacturer.example.com:7051
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050   \
+  --isInit   \
+  --tls \
+  --cafile $ORDERER_CA   \
+  --peerAddresses peer0.manufacturer.example.com:7051   \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt   \
+  -C supplychainchannel   \
+  -n supplychaincc   \
+  -c '{"Args":["initLedger"]}'
+2025-05-12 15:57:53.077 UTC 0001 INFO [chaincodeCmd] chaincodeInvokeOrQuery -> Chaincode invoke successful. result: status:200 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --isInit \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["queryAll","User"]}'
+Error: endorsement failure during invoke. response: status:500 message:"error in simulation: failed to execute transaction f2d1f86b30d38826ac854524e24be460306c1f3d35fb55f8d3ef6e5b34284b15: invalid invocation: chaincode 'supplychaincc' is already initialized but called as init" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["queryAll","User"]}'
+2025-05-12 15:59:41.310 UTC 0001 INFO [chaincodeCmd] chaincodeInvokeOrQuery -> Chaincode invoke successful. result: status:200 payload:"[]" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["createUser","kuldeep1","kk@asdf.asdf","manufacturer","rajapur"]}'
+Error: endorsement failure during invoke. response: status:500 message:"Incorrect number of arguments, Required 5 arguments" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke   -o orderer.example.com:7050   --tls true   --cafile $ORDERER_CA   --peerAddresses peer0.manufacturer.example.com:7051   --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt   -C $CHANNEL_NAME   -n supplychaincc   -c '{"Args":["createUser","kuldeep1","kk@asdf.asdf","manufacturer","rajapur"]}'
+Error: endorsement failure during invoke. response: status:500 message:"Incorrect number of arguments, Required 5 arguments" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  --peerAddresses peer0.middlemen.example.com:8051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt \
+  --peerAddresses peer0.consumer.example.com:11051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["createUser","kuldeep1","kk@asdf.asdf","manufacturer","rajapur"]}'
+Error: endorsement failure during invoke. response: status:500 message:"make sure the chaincode supplychaincc has been successfully defined on channel supplychainchannel and try again: chaincode definition for 'supplychaincc' exists, but chaincode is not installed" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  --peerAddresses peer0.middlemen.example.com:8051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt \
+  --peerAddresses peer0.consumer.example.com:11051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["createUser","kuldeep1","kk@asdf.asdf","manufacturer","rajapur","password"]}'
+Error: endorsement failure during invoke. response: status:500 message:"make sure the chaincode supplychaincc has been successfully defined on channel supplychainchannel and try again: chaincode definition for 'supplychaincc' exists, but chaincode is not installed" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["createUser","kuldeep1","kk@asdf.asdf","manufacturer","rajapur","password"]}'
+2025-05-12 16:09:37.732 UTC 0001 INFO [chaincodeCmd] chaincodeInvokeOrQuery -> Chaincode invoke successful. result: status:200 payload:"{\"Name\":\"kuldeep1\",\"UserID\":\"User1\",\"Email\":\"kk@asdf.asdf\",\"UserType\":\"manufacturer\",\"Address\":\"rajapur\",\"Password\":\"password\"}" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["queryAll","User"]}'
+2025-05-12 16:10:03.293 UTC 0001 INFO [chaincodeCmd] chaincodeInvokeOrQuery -> Chaincode invoke successful. result: status:200 payload:"[{\"Key\":\"User1\", \"Record\":{\"Name\":\"kuldeep1\",\"UserID\":\"User1\",\"Email\":\"kk@asdf.asdf\",\"UserType\":\"manufacturer\",\"Address\":\"rajapur\",\"Password\":\"password\"}}]" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["signIn","kuldeep1","password"]}'
+Error: endorsement failure during invoke. response: status:500 message:"Cannot Find Entity" 
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# ^C
+root@157b92707ac0:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke \
+  -o orderer.example.com:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0.manufacturer.example.com:7051 \
+  --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt \
+  -C $CHANNEL_NAME \
+  -n supplychaincc \
+  -c '{"Args":["signIn","User1","password"]}'
+2025-05-12 16:13:32.362 UTC 0001 INFO [chaincodeCmd] chaincodeInvokeOrQuery -> Chaincode invoke successful. result: status:200 payload:"{\"Name\":\"kuldeep1\",\"UserID\":\"User1\",\"Email\":\"kk@asdf.asdf\",\"UserType\":\"manufacturer\",\"Address\":\"rajapur\",\"Password\":\"password\"}" 

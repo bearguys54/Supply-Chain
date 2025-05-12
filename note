@@ -1,0 +1,188 @@
+├── Architecture.JPG
+├── artifacts
+│   ├── base
+│   │   ├── docker-compose-base.yaml
+│   │   └── peer-base.yaml
+│   ├── configtx.yaml
+│   ├── crypto-config.yaml
+│   ├── docker-compose.yaml
+│   └── network
+│       
+├── chaincode
+│   └── supplychain
+│       ├── go.mod
+│       ├── go.sum
+│       ├── supplychain.go
+│       └── vendor
+├── generate.sh
+├── operate.sh
+├── README.md
+├── res
+├── run.sh
+├── scripts
+│   ├── script.sh
+│   └── utils.sh
+├── startNetwork.sh
+├── stopNetwork.sh
+├── Supplychain.postman_collection.json
+├── teardown.sh
+
+
+328 directories, 1001 files
+
+heres the structure of this project
+├── artifacts
+│   ├── base
+│   │   ├── docker-compose-base.yaml
+│   │   └── peer-base.yaml
+│   ├── configtx.yaml
+│   ├── crypto-config.yaml
+│   ├── docker-compose.yaml
+│   └── network
+│       
+├── chaincode
+│   └── supplychain
+│       ├── go.mod
+│       ├── go.sum
+│       ├── supplychain.go
+│       └── vendor
+├── generate.sh
+├── operate.sh
+├── README.md
+├── res
+├── run.sh
+├── scripts
+│   ├── script.sh
+│   └── utils.sh
+├── startNetwork.sh
+├── stopNetwork.sh
+├── Supplychain.postman_collection.json
+├── teardown.sh
+heres the error i encounter:
+anhductk74@anhductk74-VMware-Virtual-Platform:~/fabric_samples/Supply-Chain$ ../bin/cryptogen generate --config=./artifacts/crypto-config.yaml --output=./artifacts/network/crypto-config
+
+export FABRIC_CFG_PATH=${PWD}/artifacts
+export SYS_CHANNEL=syschannel
+
+../bin/configtxgen -profile TraceOrdererGenesis -outputBlock ./artifacts/network/genesis.block -channelID $SYS_CHANNEL
+
+export CHANNEL_NAME=supplychainchannel
+
+../bin/configtxgen -profile TraceOrgsChannel -outputCreateChannelTx ./artifacts/network/channel.tx -channelID $CHANNEL_NAME
+
+../bin/configtxgen -profile TraceOrgsChannel -outputAnchorPeersUpdate ./artifacts/network/ManufacturerMSPanchors.tx -channelID $CHANNEL_NAME -asOrg ManufacturerMSP
+
+../bin/configtxgen -profile TraceOrgsChannel -outputAnchorPeersUpdate ./artifacts/network/MiddleMenMSPanchors.tx -channelID $CHANNEL_NAME -asOrg MiddleMenMSP
+
+../bin/configtxgen -profile TraceOrgsChannel -outputAnchorPeersUpdate ./artifacts/network/ConsumerMSPanchors.tx -channelID $CHANNEL_NAME -asOrg ConsumerMSP
+
+export MANUFACTURER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/manufacturer.example.com/ca && ls *_sk)
+
+export MIDDLEMEN_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/middlemen.example.com/ca && ls *_sk)
+
+export CONSUMER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/consumer.example.com/ca && ls *_sk)
+
+docker-compose -f artifacts/docker-compose.yaml up -d
+manufacturer.example.com
+middlemen.example.com
+consumer.example.com
+2025-05-10 05:17:43.806 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-10 05:17:43.822 +07 0002 INFO [common.tools.configtxgen.localconfig] completeInitialization -> orderer type: solo
+2025-05-10 05:17:43.822 +07 0003 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-10 05:17:43.825 +07 0004 INFO [common.tools.configtxgen] doOutputBlock -> Generating genesis block
+2025-05-10 05:17:43.825 +07 0005 INFO [common.tools.configtxgen] doOutputBlock -> Creating system channel genesis block
+2025-05-10 05:17:43.826 +07 0006 INFO [common.tools.configtxgen] doOutputBlock -> Writing genesis block
+2025-05-10 05:17:43.881 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-10 05:17:43.896 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-10 05:17:43.896 +07 0003 INFO [common.tools.configtxgen] doOutputChannelCreateTx -> Generating new channel configtx
+2025-05-10 05:17:43.901 +07 0004 INFO [common.tools.configtxgen] doOutputChannelCreateTx -> Writing new channel tx
+2025-05-10 05:17:43.955 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-10 05:17:43.974 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-10 05:17:43.974 +07 0003 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Generating anchor peer update
+2025-05-10 05:17:43.976 +07 0004 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Writing anchor peer update
+2025-05-10 05:17:44.037 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-10 05:17:44.053 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-10 05:17:44.053 +07 0003 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Generating anchor peer update
+2025-05-10 05:17:44.056 +07 0004 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Writing anchor peer update
+2025-05-10 05:17:44.110 +07 0001 INFO [common.tools.configtxgen] main -> Loading configuration
+2025-05-10 05:17:44.125 +07 0002 INFO [common.tools.configtxgen.localconfig] Load -> Loaded configuration: /home/anhductk74/fabric_samples/Supply-Chain/artifacts/configtx.yaml
+2025-05-10 05:17:44.125 +07 0003 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Generating anchor peer update
+2025-05-10 05:17:44.128 +07 0004 INFO [common.tools.configtxgen] doOutputAnchorPeersUpdate -> Writing anchor peer update
+Creating network "artifacts_supplychain_hlfn" with the default driver
+Creating volume "artifacts_orderer.example.com" with default driver
+Creating volume "artifacts_peer0.manufacturer.example.com" with default driver
+Creating volume "artifacts_peer0.middlemen.example.com" with default driver
+Creating volume "artifacts_peer1.middlemen.example.com" with default driver
+Creating volume "artifacts_peer2.middlemen.example.com" with default driver
+Creating volume "artifacts_peer0.consumer.example.com" with default driver
+Creating peer0.manufacturer.example.com ... done
+Creating peer1.middlemen.example.com    ... done
+Creating ca.middlemen.example.com       ... done
+Creating peer2.middlemen.example.com    ... done
+Creating ca.manufacturer.example.com    ... done
+Creating peer0.middlemen.example.com    ... done
+Creating ca.consumer.example.com        ... done
+Creating orderer.example.com            ... done
+Creating peer0.consumer.example.com     ... done
+Creating cli                            ... done
+anhductk74@anhductk74-VMware-Virtual-Platform:~/fabric_samples/Supply-Chain$ docker exec -it cli bash
+root@cb9786d22b7d:/opt/gopath/src/github.com/hyperledger/fabric/peer# export CHANNEL_NAME=supplychainchannel
+root@cb9786d22b7d:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+2025-05-09 22:18:13.167 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:13.278 UTC 0002 INFO [cli.common] readBlock -> Received block: 0
+root@cb9786d22b7d:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer channel join -b supplychainchannel.block
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer0.middlemen.example.com:8051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer1.middlemen.example.com:9051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer1.middlemen.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer2.middlemen.example.com:10051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer2.middlemen.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/users/Admin@consumer.example.com/msp CORE_PEER_ADDRESS=peer0.consumer.example.com:11051 CORE_PEER_LOCALMSPID="ConsumerMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt peer channel join -b $CHANNEL_NAME.block
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/users/Admin@manufacturer.example.com/msp CORE_PEER_ADDRESS=peer0.manufacturer.example.com:7051 CORE_PEER_LOCALMSPID="ManufacturerMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.example.com/peers/peer0.manufacturer.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/ManufacturerMSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/users/Admin@middlemen.example.com/msp CORE_PEER_ADDRESS=peer0.middlemen.example.com:8051 CORE_PEER_LOCALMSPID="MiddleMenMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/middlemen.example.com/peers/peer0.middlemen.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/MiddleMenMSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/users/Admin@consumer.example.com/msp CORE_PEER_ADDRESS=peer0.consumer.example.com:11051 CORE_PEER_LOCALMSPID="ConsumerMSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/consumer.example.com/peers/peer0.consumer.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/ConsumerMSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert..example.com/peers/peer0.manufacturer.example.com/tls/ca.crt edger/fabric/peer/crypto/peerOrganizations/manufacturer
+2025-05-09 22:18:25.075 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.099 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-09 22:18:25.173 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.196 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-09 22:18:25.270 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.294 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-09 22:18:25.367 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.392 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-09 22:18:25.469 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.491 UTC 0002 INFO [channelCmd] executeJoin -> Successfully submitted proposal to join channel
+2025-05-09 22:18:25.556 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.575 UTC 0002 INFO [channelCmd] update -> Successfully submitted channel update
+2025-05-09 22:18:25.646 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.664 UTC 0002 INFO [channelCmd] update -> Successfully submitted channel update
+2025-05-09 22:18:25.729 UTC 0001 INFO [channelCmd] InitCmdFactory -> Endorser and orderer connections initialized
+2025-05-09 22:18:25.747 UTC 0002 INFO [channelCmd] update -> Successfully submitted channel update
+root@cb9786d22b7d:/opt/gopath/src/github.com/hyperledger/fabric/peer# cd /opt/gopath/src/github.com/chaincode/supplychain
+export GO111MODULE=on
+export GOFLAGS='-mod=vendor'
+root@cb9786d22b7d:/opt/gopath/src/github.com/chaincode/supplychain# go mod tidy
+go mod vendor
+go: downloading github.com/hyperledger/fabric-chaincode-go v0.0.0-20240704073638-9fb89180dc17
+go: downloading github.com/hyperledger/fabric-protos-go v0.3.7
+go: downloading github.com/golang/protobuf v1.5.4
+go: downloading google.golang.org/grpc v1.67.3
+go: downloading google.golang.org/protobuf v1.36.3
+go: downloading github.com/stretchr/testify v1.9.0
+go: downloading github.com/google/go-cmp v0.6.0
+go: downloading golang.org/x/net v0.34.0
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f
+go: downloading github.com/davecgh/go-spew v1.1.1
+go: downloading github.com/pmezard/go-difflib v1.0.0
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading golang.org/x/sys v0.29.0
+go: downloading golang.org/x/text v0.21.0
+root@cb9786d22b7d:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode install -n supplychaincc -v 1.0 -p github.com/chaincode/supplychain
+2025-05-09 22:19:21.381 UTC 0001 INFO [chaincodeCmd] checkChaincodeCmdParams -> Using default escc
+2025-05-09 22:19:21.381 UTC 0002 INFO [chaincodeCmd] checkChaincodeCmdParams -> Using default vscc
+2025-05-09 22:19:30.308 UTC 0003 INFO [chaincodeCmd] submitInstallProposal -> Installed remotely: response:<status:200 payload:"OK" > 
+root@cb9786d22b7d:/opt/gopath/src/github.com/chaincode/supplychain# peer chaincode invoke -o orderer.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C $CHANNEL_NAME -n supplychaincc -c '{"Args":["createUser","kuldeep1","kk@asdf.asdf","manufacturer","rajapur"]}'
+Error: endorsement failure during invoke. response: status:500 message:"make sure the chaincode supplychaincc has been successfully defined on channel supplychainchannel and try again: chaincode supplychaincc not found" 
